@@ -1,0 +1,141 @@
+DEscrição do problema - ok
+Revisão bibliográfica - ok
+
+
+Construção Aleatória
+
+Função de avaliação: 
+	criar um matriz de distancias, se o arco existe, custo zero, senão valor suficientemente grande: 10 
+		- MIn de maquinistas e satisfação: 
+               	
+		escala_trab: 
+            	se a cada periodo de 7 dias:  
+                 	dias ativos consecutivos <= 6 := 0; 
+                 	caso contrário, penalidade = 1 (inviabilidades)
+                 	inviabilidades: 1 a cada período de 7 dias consecutivos
+        	20: numero máximo de maquinistas; 
+        	dist = somatório da "distancia" percorrida por todos os maquinistas;
+        	n_maquinistas: número de maquinistas utilizados;
+        	w1, w2, w3, w4, w5: pesos da função objetivo
+        	k: horizonte de planejamento
+		
+		fo normalizada Min de maquinistas e MAX satisfação
+		fo = w1 . (dist/(k . 10 . 20) + 1) + w2. n_maquinistas/20  + w3 . (escala_trab) / ((k-7) . 20) + w4 . ((dia_ferias*custo_ferias)/(total_dia_ferias_maquinistas*10) + 1)
++ w5 . ((total_dia_ferias_maquinistas - dias folga)/total_dia_ferias_maquinistas) +1) 
+		dia_ferias: dia no qual as férias está alocada
+		custo_ferias: valor segundo arquivo de entrada (vac_#_#)
+		total_dia_ferias_maquinistas: para cada dia com valor negativo somar +1
+		dias_folga: total de dias de folga/férias 
+		
+		----------------------------------------------------
+		
+		satisfacao: dia_ferias*custo_ferias
+		
+		w3 deveria conter +1 pois não deveria ser permitido por lei um maquinista trabalho mais de 6 dias seguidos.
+
+		Alterações a serem feitas fazer uma nova fo considerando o pior cenario de dia_ferias*custo_ferias 
+		ja que esse valor poder ser negativo vai atrapalhar validar se a solução é valida ou não.
+		
+		Como indentificar quantos maquinistas foram usados? verificar se algum não trabalhou um unico dia, caso tenha trabalho foi usado.
+		
+		total_dia_ferias_maquinistas remodelagem: para cada dia com valor -10 somar +1  
+		(considerei isso pois -1 significa indiferente e não que obrigatoriamente deve possuir folga)
+
+		dias_folga: fazer um somatorio onde para cada maquinista que não tirou as ferias alocadas no periodo soma 1
+		assim é possivel tirar o total_dia_ferias_maquinistas da contagem do w5
+
+		remodelado w5:
+
+		w5 . (dias folga/total_dia_ferias_maquinistas) + 1
+
+		w1, w3 e w5 não deveriam ser usados apenas para validar se a solução é valida? logo eles não precisam dos pesos apenas as contas
+
+		substituir todos +1 dos que tornam a solução invalida para +3 (w1,w3,w5)
+
+		Se a solução for maior que 2 ela é invalida
+
+		w4 não precisaria de uma remodelagem? Talvez seja possivel verificar no arquivo os dias marcados com -10 (não quer trabalhar)
+		caso tenha tirado folga neste dia subtraia 10, caso contrario some 10. Pois da forma que esta mesmo que o funcionario não possua folga alocada
+		(tudo seja 5) o codigo será penalizado sempre com +5 aumentando drasticamente o valor da fo.
+
+		w4 . ((dia_ferias*custo_ferias)/(total_dia_ferias_maquinistas*10) + 1)
+
+		remodelar o w4 para:
+
+		w4 . (-satisfacao_min + satisfacao) / (-satisfacao_min + satisfacao_max)
+
+		satisfacao_min: A satisfação minima que é possível chegar com todos maquinistas por exemplo existem cinco -10 o valor min possivel sera -50
+		satisfacao_max: Esta terá sempre o valor oposto da satisfação minima, usando o exemplo acima satisfação max daria 50 
+
+		Com essa conta será garantido que w4 estara entre 0 e 1
+
+		Modifiquei a função fo para ao inves de somar 1 as contas que causariam uma solução invalida, dessa forma
+		quando um dos valores for 0 este valor não vai atrapalhar e caso o valor seja outro número (todos que multiplicam 1 são inteiros)
+		o mesmo vai fazer uma multiplicação por 3, para garantir assim que caso tenho uma solução invalida o valor fique superior a 2. 
+
+		Exemplo:
+
+		w1 . (dist * 3 /(k . 10 . 20))
+
+		Logo para solução ser válida o valor deve ser <= a 2
+		
+		----------------------------------------------------
+
+		-200 // min_possivel
+		200 // max_possivel
+
+		(-min_possivel+max_possivel + satisfação-max_possivel) / (-min_possivel+max_possivel)
+
+		Exemplo 1:
+
+		satisfação = 0
+
+		(--200 + 200 + 0 - 200) / (--200 -200)
+		(300-200) / 300 = 0.66 
+
+		Exemplo 2:
+
+		satisfacao = -50
+
+		(--200 + 200 - 50 - 200) / (--200 -200)
+		150 / 300 = 0.5 
+
+		Exemplo 3:
+
+		satisfacao = 200
+
+		(--200 + 200 + 200 - 200) / (--200 -200)
+		300 / 300 = 1
+
+		Possibilitando ir de 0 a 1 multiplicando pelo peso w4
+
+		----------------------------------------------------
+
+Construção Gulosa
+	Vizinho mais próximo sem inviabilidade
+	Inserção mais barata sem inviabilidade
+
+Construção Parcialmente Gulosa
+	
+                       
+Movimentos:
+	troca simples, dias diferentes, mesmo maquinista
+        troca simples, mesmo dias, maquinistas diferentes 
+        troca simples, dias diferentes, maquinistas diferentes 
+
+        desativa funcionário s/ realocação
+        desativa funcionário c/ realocação de tarefas
+
+	troca trecho, dias diferentes, mesmo maquinista
+        troca trecho, mesmo dias, maquinistas diferentes 
+
+	realoca folga: realoca dois dias de folga consecutivos
+	insere folga: aloca dois dias de folga consecutivos
+
+Busca local: VND 
+
+Metaheuristica:
+	ILS
+	ILS com LACH
+	GRASP
+	GRASP c/ ILS
