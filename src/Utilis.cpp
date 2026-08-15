@@ -28,7 +28,7 @@ double Utils::calcula_fo(int inviabilidadesEscala, int dist, int numMaquinistas,
            w2*0 * ((float)maquinistasUtilizados / (float)numMaquinistas) +
            w3 * (inviabilidadesEscala * 3) +
            w4 * (((float)satisfacao + (float)satisfacao_max) / (float)(satisfacao_max*2)) +
-           w5 * (numMaquinistasDevendoFerias * 3) +
+           w5*0 * (numMaquinistasDevendoFerias * 3) +
            w6 * (tarefasSemMaquinista * 3);
 }
 
@@ -43,7 +43,7 @@ int Utils::calcularInviabilidadesEscala(vector<vector<int>>& escala, int numMaqu
 
         for (int j = 0; j < k; j++)
         {
-            if (escala[i][j] != 10 && escala[i][j] != 11)
+            if (escala[i][j] != 10 && escala[i][j] != 11 && escala[i][j] != 12)
             {
                 diasTrabalhados++;
             }
@@ -97,11 +97,11 @@ int Utils::calcularSatisfacao(vector<vector<int>>& preferencias, vector<vector<i
     {
         for (int j = 0; j < k; j++)
         {
-            if (preferencias[i][j] == -10 && escala[i][j] != 10 && escala[i][j] != 11)
+            if (preferencias[i][j] == -10 && escala[i][j] != 12)
             {
                 satisfacao += 10;
             }
-            else if (preferencias[i][j] == -10 && (escala[i][j] == 10 || escala[i][j] == 11))
+            else if (preferencias[i][j] == -10 &&  escala[i][j] == 12)
             {
                 satisfacao += -10;
             }
@@ -125,7 +125,7 @@ int Utils::calcularFeriasNaoAtendidas(vector<vector<int>>& escala, int k, int nu
         
         for(int j = 0; j < k; j++)
         {
-            if(escala[i][j] == 10 || escala[i][j] == 11)
+            if(escala[i][j] == 12)
             {
                 cont++;
             }
@@ -754,14 +754,16 @@ bool Utils::reconstroiParcialmenteSolucao(int k,
     vector<vector<int>> alocacaoFeriasMaquinistas(numMaquinistas, vector<int>(k)); // Deixa alocado as férias dos maquinistas
     vector<int> tarefasNecessariasVerificar = {6, 7, 2, 3}; // Tarefas que precisam ser verificadas pois podem ficar sem maquinistas alocados
 
-    // Aloca a tarefa 11 em toda a escala para os maquinistas dispensados
+    // Aloca a tarefa 12 em toda a escala para os maquinistas dispensados
     for(int i = 0; i < (int)maquinistasDispensados.size(); i++)
     {
         // cout << "Maquinista dispensado: " << maquinistasDispensados[i] << endl;
         diaFeriasMaquinista[maquinistasDispensados[i]] = 0; // Zera os dias de ferias para os maquinistas dispensados
+        blocosFeriasMaquinista[maquinistasDispensados[i]].clear(); // Limpa os blocos de ferias para os maquinistas dispensados
+        escala[maquinistasDispensados[i]][0] = 12;
         for(int j = 1; j < k; j++)
         {
-            escala[maquinistasDispensados[i]].push_back(11);
+            escala[maquinistasDispensados[i]].push_back(12);
         }
     }
 
@@ -829,13 +831,20 @@ bool Utils::reconstroiParcialmenteSolucao(int k,
                 ultimaTarefa != 6 && ultimaTarefa != 7 && ultimaTarefa != 8 && ultimaTarefa != 9)
             {
                 int cont = i; // Váriavel para auxiliar a alocar completamente as férias do maquinista
+                int t = 0; // Variável para auxiliar a transformar 10 e 11 em 12 caso o maquinista esteja de folga ou férias no dia anterior
                 if(diasTrabalhados[j] != 6 && diasTrabalhados[j] != 0) salvarDiasTrabalhados.push_back(diasTrabalhados[j]);
                 diasTrabalhados[j] = 0; // Zera os dias trabalhados por estar de ferias
 
+                while(escala[j][i-t-1] == 11 || escala[j][i-t-1] == 10)
+                {
+                    escala[j][i-t-1] = 12;
+                    t++;
+                }
+
                 if(ultimaTarefa == 0 || ultimaTarefa == 1 || ultimaTarefa == 4 || ultimaTarefa == 5)
                 {
-                    // Caso o maquinista estivesse trabalhando inicia as férias indo para a tarefa 10
-                    escala[j].push_back(10);
+                    // Caso o maquinista estivesse trabalhando inicia as férias indo para a tarefa 12
+                    escala[j].push_back(12);
                     cont += 1;
                 }
 
@@ -843,7 +852,7 @@ bool Utils::reconstroiParcialmenteSolucao(int k,
                 while(cont < k && alocacaoFeriasMaquinistas[j][cont] > 0)
                 {
                     cont++;
-                    escala[j].push_back(11);
+                    escala[j].push_back(12);
                 }
             }
             else
@@ -854,7 +863,7 @@ bool Utils::reconstroiParcialmenteSolucao(int k,
                     escala[j].push_back(10);
                     diasTrabalhados[j] = 0;
                 }
-                else if(ultimaTarefa != 11) // Caso o maquinista não esteja de folga/ferias e apto a trabalhar no dia seguinte
+                else if(ultimaTarefa != 11 && ultimaTarefa != 12) // Caso o maquinista não esteja de folga/ferias e apto a trabalhar no dia seguinte
                 {
                     int numTransicoes = transicoesDeTarefas[ultimaTarefa].size();
                     int proxTarefa;

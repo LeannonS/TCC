@@ -685,13 +685,15 @@ void Construcao::gerarEscalaValida(int k,
         // maquinistasDispensados.push_back(16);
     }
 
-    // Aloca a tarefa 11 em toda a escala para os maquinistas dispensados
+    // Aloca a tarefa 12 em toda a escala para os maquinistas dispensados
     for(int i = 0; i < (int)maquinistasDispensados.size(); i++)
     {
         diaFeriasMaquinista[maquinistasDispensados[i]] = 0; // Zera os dias de ferias para os maquinistas dispensados
+        blocosFeriasMaquinista[maquinistasDispensados[i]].clear(); // Limpa os blocos de ferias para os maquinistas dispensados
+        escala[maquinistasDispensados[i]][0] = 12;
         for(int j = 1; j < k; j++)
         {
-            escala[maquinistasDispensados[i]].push_back(11);
+            escala[maquinistasDispensados[i]].push_back(12);
         }
     }
 
@@ -761,13 +763,20 @@ void Construcao::gerarEscalaValida(int k,
                 ultimaTarefa != 6 && ultimaTarefa != 7 && ultimaTarefa != 8 && ultimaTarefa != 9)
             {
                 int cont = i; // Váriavel para auxiliar a alocar completamente as férias do maquinista
+                int t = 0; // Variável para auxiliar a transformar 10 e 11 em 12 caso o maquinista esteja de folga ou férias no dia anterior
                 if(diasTrabalhados[j] != 6 && diasTrabalhados[j] != 0) salvarDiasTrabalhados.push_back(diasTrabalhados[j]);
                 diasTrabalhados[j] = 0; // Zera os dias trabalhados por estar de ferias
 
+                while(escala[j][i-t-1] == 11 || escala[j][i-t-1] == 10)
+                {
+                    escala[j][i-t-1] = 12;
+                    t++;
+                }
+
                 if(ultimaTarefa == 0 || ultimaTarefa == 1 || ultimaTarefa == 4 || ultimaTarefa == 5)
                 {
-                    // Caso o maquinista estivesse trabalhando inicia as férias indo para a tarefa 10
-                    escala[j].push_back(10);
+                    // Caso o maquinista estivesse trabalhando inicia as férias indo para a tarefa 12
+                    escala[j].push_back(12);
                     cont += 1;
                 }
 
@@ -775,7 +784,7 @@ void Construcao::gerarEscalaValida(int k,
                 while(cont < k && alocacaoFeriasMaquinistas[j][cont] > 0)
                 {
                     cont++;
-                    escala[j].push_back(11);
+                    escala[j].push_back(12);
                 }
             }
             else
@@ -786,7 +795,7 @@ void Construcao::gerarEscalaValida(int k,
                     escala[j].push_back(10);
                     diasTrabalhados[j] = 0;
                 }
-                else if(ultimaTarefa != 11) // Caso o maquinista não esteja de folga/ferias e apto a trabalhar no dia seguinte
+                else if(ultimaTarefa != 11 && ultimaTarefa != 12) // Caso o maquinista não esteja de folga/ferias e apto a trabalhar no dia seguinte
                 {
                     int numTransicoes = transicoesDeTarefas[ultimaTarefa].size();
                     int proxTarefa;
