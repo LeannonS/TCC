@@ -28,7 +28,7 @@ double Utils::calcula_fo(int inviabilidadesEscala, int dist, int numMaquinistas,
            w2*0 * ((float)maquinistasUtilizados / (float)numMaquinistas) +
            w3 * (inviabilidadesEscala * 3) +
            w4 * (((float)satisfacao + (float)satisfacao_max) / (float)(satisfacao_max*2)) +
-           w5*0 * (numMaquinistasDevendoFerias * 3) +
+           w5 * (numMaquinistasDevendoFerias * 3) +
            w6 * (tarefasSemMaquinista * 3);
 }
 
@@ -221,7 +221,7 @@ int Utils::calcularTarefasSemMaquinista(vector<vector<int>>& escala, int numMaqu
         {
             if (contagemTarefas[t] == 0) 
             {
-                cout << j << endl;
+                // cout << j << endl;
                 return 1;
             }
         }
@@ -440,6 +440,8 @@ int Utils::alocarFeriasMquinistas(int k,
 
     int auxInicio = (k-k*0.1*porcentagemDestruicao);
 
+    if(auxInicio < 2) auxInicio = 2;
+
     for(auto j: maquinistasFaltantes)
     {
         for(int i = auxInicio; i < k; i++)
@@ -627,7 +629,7 @@ int Utils::alocarFeriasMquinistas(int k,
     }
 
     // Caso algum maquinista não tenha tirado todas as férias alocadas resolve o problema
-    for(int i = 0; i < numMaquinistas; i++)
+    for(int i = 2; i < numMaquinistas; i++)
     {
         if(find(maquinistasDispensados.begin(), maquinistasDispensados.end(), i) != maquinistasDispensados.end()) continue;
         if(diaFeriasMaquinista[i] <= 0) continue;
@@ -675,16 +677,18 @@ int Utils::alocarFeriasMquinistas(int k,
         }
         sort(blocosFeriasFaltantes.rbegin(), blocosFeriasFaltantes.rend());
 
-        inicio = 2;
         for(int x = 0; x < (int)blocosFeriasFaltantes.size(); x++)
         {
+            inicio = 2;
+            cont = 0;
             for(int j = inicio; j < k; j++)
             {
                 if(tarefasAlocadas[12][j] < 2 && alocacaoFeriasMaquinistas[i][j] == 0)
                 {
                     if (cont == 0) inicio = j;
                     cont++;
-                    if(cont == blocosFeriasFaltantes[x]+2 || (cont == blocosFeriasFaltantes[x] && alocacaoFeriasMaquinistas[i][inicio-blocosFeriasFaltantes[x]-1] == 1 && inicio-blocosFeriasFaltantes[x]-1 >= 0))
+                    // if(cont == blocosFeriasFaltantes[x]+2 || (cont == blocosFeriasFaltantes[x] && alocacaoFeriasMaquinistas[i][inicio-blocosFeriasFaltantes[x]-1] == 1 && inicio-blocosFeriasFaltantes[x]-1 >= 0))
+                    if(cont == blocosFeriasFaltantes[x]+2)
                     {
                         fim = j;
                         break;
@@ -726,7 +730,7 @@ int Utils::alocarFeriasMquinistas(int k,
     // for(int j = 0; j < numMaquinistas; j++)
     // {
     //     cout << endl << endl << "Maquinista " << j << ": " << endl;
-    //     for(int i = 45; i < 60; i++)
+    //     for(int i = 0; i < k; i++)
     //     {
     //         cout << alocacaoFeriasMaquinistas[j][i] << " ";
     //     }

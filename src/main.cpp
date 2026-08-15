@@ -170,6 +170,8 @@ int main()
     cout << "Função Objetivo: " << fixed << setprecision(4) << fo << endl << endl;
     utils.salvarResultado("resultado.txt", escala, numMaquinistas, k);
 
+    // int vv=0;
+
     while(cont <= 10)
     {
         for(int i = 0; i < 10; i++)
@@ -200,14 +202,17 @@ int main()
                                         numMaquinistasDevendoFerias, maquinistasUtilizados, tarefasSemMaquinista, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f);
 
 
-                if(fo_atual >= 3)
-                {     
-                    fo = fo_atual;
-                    cout << "Função Objetivo: " << fixed << setprecision(4) << fo << endl << endl;
-                    utils.salvarResultado("resultado.txt", escala, numMaquinistas, k);
-                    exit(1);
-                }
-                cout << fo_atual << endl;
+                // if(fo_atual >= 3)
+                // {     
+                //     vv++;
+                //     // fo = fo_atual;
+                //     // cout << "Função Objetivo: " << fixed << setprecision(4) << fo << endl << endl;
+                //     // utils.salvarResultado("resultado.txt", escala, numMaquinistas, k);
+                //     // exit(1);
+                // }
+
+                // cout << fo_atual << endl;
+                
                 if(fo_atual < fo)
                 {     
                     fo = fo_atual;
@@ -219,6 +224,8 @@ int main()
 
         cont++;
     }
+
+    // cout << vv << endl;
 
     return 0;
 }
