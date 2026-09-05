@@ -38,7 +38,8 @@ class Utils
                                             vector<vector<int>> tarefasAlocadas,
                                             vector<int>& maquinistasDispensados,
                                             vector<vector<int>> &blocosFeriasMaquinista,
-                                            vector<vector<int>>& escala);
+                                            vector<vector<int>>& escala,
+                                            int porcDestruicao);
 
         // Função que vai destruindo 10% da solução e tentando reconstruir para obter melhora
         bool reconstroiParcialmenteSolucao(int k, 
@@ -50,7 +51,8 @@ class Utils
                                             vector<vector<int>>& preferencias,
                                             vector<int>& diaFeriasMaquinista,
                                             vector<vector<int>>& blocosFeriasMaquinista,
-                                            vector<int>& maquinistasDispensados);
+                                            vector<int>& maquinistasDispensados,
+                                            int porcDestruicao);
 };
 
 #endif

@@ -46,10 +46,14 @@
 
 using namespace std;
 
+int numIteracoes = 100; // Número de iterações para reconstrução parcial da solução
+int porcDestruicao = 10; // Porcentagem de destruição da solução a cada iteração
+
 const int k = 360; // Horizonte de planejamento (número de dias)
 const int numTarefas = 12;
 const int numMaquinistas = 20;
-const string nomeArquivoVac = "vac_360_0";
+const string nomeArquivoStart = "start/start0";
+const string nomeArquivoVac = "vac/vac_360_0";
 
 // Matriz de distância entre tarefas
 // Distância 0 indica que a transição é possível
@@ -138,7 +142,7 @@ int main()
     vector<int> maquinistasDispensados; // Maquinistas a serem dispensados
 
     // Le o arquivo start
-    if (!arq.lerArquivoStart("start0", escala))
+    if (!arq.lerArquivoStart(nomeArquivoStart, escala))
     {
         return 1;
     }
@@ -155,7 +159,7 @@ int main()
     // c.gerarEscalaAleatoria(k, numTarefas, numMaquinistas, transicoesDeTarefas, escala);
 
     c.gerarEscalaValida(k, numTarefas, numMaquinistas, auxiliarDeTransicoesDeTarefas, escala, preferencias, 
-                        diaFeriasMaquinista, blocosFeriasMaquinista, maquinistasDispensados);
+                        diaFeriasMaquinista, blocosFeriasMaquinista, maquinistasDispensados, porcDestruicao);
 
     inviabilidadesEscala = utils.calcularInviabilidadesEscala(escala, numMaquinistas, k);
     somatorioDist = utils.calcularSomatorioDistancia(matDist, escala, numMaquinistas, k);
@@ -172,9 +176,11 @@ int main()
 
     // int vv=0;
 
-    while(cont <= 10)
+    int numDestruicao = 100/porcDestruicao; // Quantas vezes vai destruir a solução
+
+    while(cont <= numDestruicao)
     {
-        for(int i = 0; i < 10; i++)
+        for(int i = 0; i < numIteracoes; i++)
         {
             // zera a escala de todos maquinistas para o dia 0
             for(int m = 0; m < numMaquinistas; m++)
@@ -187,7 +193,7 @@ int main()
 
             // Chama a função para gerar uma escala de forma aleatória
             ver = utils.reconstroiParcialmenteSolucao(k, numTarefas, numMaquinistas, cont, auxiliarDeTransicoesDeTarefas, escala, preferencias, 
-                                diaFeriasMaquinista, blocosFeriasMaquinista, maquinistasDispensados);
+                                diaFeriasMaquinista, blocosFeriasMaquinista, maquinistasDispensados, porcDestruicao);
 
             if(ver)
             {

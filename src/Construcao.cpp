@@ -142,7 +142,8 @@ int Construcao::alocarFeriasMquinistas(int k,
                                         vector<vector<int>> tarefasAlocadas,
                                         vector<int>& maquinistasDispensados,
                                         vector<vector<int>>& blocosFeriasMaquinista,
-                                        vector<vector<int>>& escala)
+                                        vector<vector<int>>& escala,
+                                        int porcDestruicao)
 {
     int aux = 2; // Variavel para adicionar 2 dias de ferias extras para o maquinista
     // Conta quantas preferencias de ferias foram perdidas para cada maquinista
@@ -152,7 +153,7 @@ int Construcao::alocarFeriasMquinistas(int k,
     vector<vector<int>> blocosFeriasTirados(numMaquinistas); // Salva os blocos de ferias que foram alocados para cada maquinista
 
     int parada = k;
-    if(tentativas!=0) parada = (k-k*0.1*tentativas);
+    if(tentativas!=0) parada = (k-k*(porcDestruicao/100.0)*tentativas);
 
     for(int i = 0; i < parada; i++)
     {
@@ -646,7 +647,9 @@ void Construcao::gerarEscalaValida(int k,
                             vector<vector<int>>& preferencias,
                             vector<int>& diaFeriasMaquinista,
                             vector<vector<int>>& blocosFeriasMaquinista,
-                            vector<int>& maquinistasDispensados)
+                            vector<int>& maquinistasDispensados,
+                            int porcDestruicao
+                        )
 {       
     vector<int> salvarDiasTrabalhados; // Variavel para salvar os dias trabalhados para passar de um maquinista para outro
     vector<int> diasTrabalhados(numMaquinistas); // Conta os dias trabalhados consecutivos de cada maquinista
@@ -704,7 +707,7 @@ void Construcao::gerarEscalaValida(int k,
     {
         // Reseta o vetor para o estado inicial
         for (auto& linha : alocacaoFeriasMaquinistas) fill(linha.begin(), linha.end(), 0);
-        ver = Construcao::alocarFeriasMquinistas(k, numMaquinistas, tentativas, preferencias, alocacaoFeriasMaquinistas, diaFeriasMaquinista, tarefasAlocadas, maquinistasDispensados, blocosFeriasMaquinista, escala);
+        ver = Construcao::alocarFeriasMquinistas(k, numMaquinistas, tentativas, preferencias, alocacaoFeriasMaquinistas, diaFeriasMaquinista, tarefasAlocadas, maquinistasDispensados, blocosFeriasMaquinista, escala, porcDestruicao);
         tentativas++;
     }
 
