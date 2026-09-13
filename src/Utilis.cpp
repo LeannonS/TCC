@@ -25,7 +25,7 @@ double Utils::calcula_fo(int inviabilidadesEscala, int dist, int numMaquinistas,
 {
     // cout << numMaquinistasDevendoFerias << endl;
     return w1 * (dist * 3) +
-           w2*0 * ((float)maquinistasUtilizados / (float)numMaquinistas) +
+           w2 * ((float)maquinistasUtilizados / (float)numMaquinistas) +
            w3 * (inviabilidadesEscala * 3) +
            w4 * (((float)satisfacao + (float)satisfacao_max) / (float)(satisfacao_max*2)) +
            w5 * (numMaquinistasDevendoFerias * 3) +
@@ -189,7 +189,7 @@ int Utils::calcularMaquinistasUtilizados(vector<vector<int>>& escala, int numMaq
     {
         for (int j = 0; j < k; j++)
         {
-            if (escala[i][j] != 10 && escala[i][j] != 11)
+            if (escala[i][j] != 10 && escala[i][j] != 11 && escala[i][j] != 12)
             {
                 numMaquinistasUtilizados++;
                 break;
@@ -437,7 +437,7 @@ int Utils::alocarFeriasMquinistas(int k,
     // Logica para cada vez que a função ser chamado o algoritmo tenta mudar a ordem de preferentencia dos maquinistas
     static random_device rd; 
     static default_random_engine rng(rd());
-    std::shuffle(maquinistasFaltantes.begin(), maquinistasFaltantes.end(), rng);
+    shuffle(maquinistasFaltantes.begin(), maquinistasFaltantes.end(), rng);
 
     int auxInicio = (k-k*(porcDestruicao/100.0)*porcentagemDestruicao);
 

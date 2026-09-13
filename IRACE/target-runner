@@ -1,0 +1,10 @@
+#!/bin/bash
+
+INSTANCE_STRING=$4 
+shift 4 
+
+read ARQ_START ARQ_VAC <<< "$INSTANCE_STRING"
+
+RESULT=$(../build/app --start "$ARQ_START" --vac "$ARQ_VAC" $@)
+
+echo "$RESULT"

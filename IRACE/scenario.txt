@@ -1,0 +1,6 @@
+targetRunner = "./target-runner"
+parameterFile = "parameters.txt"
+trainInstancesFile = "instancias.txt"
+maxExperiments = 1000
+testType = "F-test"
+logFile = "irace-output4.Rdata"
